@@ -1,0 +1,7 @@
+{
+  "_note": "演示数据：门店结构镜像麦当劳 MCP query-nearby-stores 返回。",
+  "stores": [
+    { "id": "S001", "name": "麦当劳（文一路餐厅）", "address": "杭州市西湖区文一路298号", "distance_m": 380, "services": ["到店取餐", "得来速", "麦乐送"] },
+    { "id": "S002", "name": "麦当劳（宋江商贸大厦甜品站）", "address": "杭州市西湖区文一路298号宋江商贸大厦1楼", "distance_m": 420, "services": ["到店取餐", "麦乐送"] }
+  ]
+}

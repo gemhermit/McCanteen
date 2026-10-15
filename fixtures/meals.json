@@ -1,0 +1,29 @@
+{
+  "_note": "演示数据：结构镜像麦当劳 MCP query-meals 返回；餐品、价格与供应状态以门店实时查询为准。金额单位为分。",
+  "meals": [
+    { "code": "99000001", "name": "板烧鸡腿堡", "category": "汉堡", "price_fen": 2050, "kcal": 420, "protein_g": 22, "tags": ["热销"], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000002", "name": "麦辣鸡腿堡", "category": "汉堡", "price_fen": 2100, "kcal": 480, "protein_g": 24, "tags": ["热销"], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000003", "name": "双层吉士堡", "category": "汉堡", "price_fen": 1950, "kcal": 430, "protein_g": 22, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000004", "name": "巨无霸", "category": "汉堡", "price_fen": 2500, "kcal": 530, "protein_g": 27, "tags": ["经典"], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000005", "name": "麦香鱼", "category": "汉堡", "price_fen": 2000, "kcal": 380, "protein_g": 17, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000006", "name": "不素之霸双层牛堡", "category": "汉堡", "price_fen": 2350, "kcal": 560, "protein_g": 30, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000007", "name": "猪柳蛋麦满分", "category": "早餐", "price_fen": 1300, "kcal": 380, "protein_g": 19, "tags": [], "slots": ["breakfast"] },
+    { "code": "99000008", "name": "烟肉蛋麦满分", "category": "早餐", "price_fen": 1350, "kcal": 400, "protein_g": 20, "tags": [], "slots": ["breakfast"] },
+    { "code": "99000009", "name": "热香饼（3块）", "category": "早餐", "price_fen": 900, "kcal": 330, "protein_g": 8, "tags": [], "slots": ["breakfast"] },
+    { "code": "99000010", "name": "薯条（大）", "category": "小食", "price_fen": 1300, "kcal": 340, "protein_g": 5, "tags": ["人气"], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000011", "name": "麦乐鸡（5块）", "category": "小食", "price_fen": 1250, "kcal": 250, "protein_g": 15, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000012", "name": "麦辣鸡翅（2块）", "category": "小食", "price_fen": 1300, "kcal": 280, "protein_g": 16, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000013", "name": "脆薯饼", "category": "小食", "price_fen": 700, "kcal": 150, "protein_g": 2, "tags": [], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000014", "name": "玉米杯（小）", "category": "小食", "price_fen": 800, "kcal": 90, "protein_g": 3, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000015", "name": "甜筒", "category": "甜品", "price_fen": 600, "kcal": 180, "protein_g": 4, "tags": [], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000016", "name": "菠萝派", "category": "甜品", "price_fen": 850, "kcal": 260, "protein_g": 3, "tags": [], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000017", "name": "麦旋风（奥利奥）", "category": "甜品", "price_fen": 1200, "kcal": 320, "protein_g": 7, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000018", "name": "可口可乐（大）", "category": "饮品", "price_fen": 1100, "kcal": 210, "protein_g": 0, "tags": [], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000019", "name": "鲜煮咖啡", "category": "饮品", "price_fen": 1000, "kcal": 15, "protein_g": 1, "tags": [], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000020", "name": "锡兰红茶", "category": "饮品", "price_fen": 900, "kcal": 0, "protein_g": 0, "tags": [], "slots": ["breakfast", "lunch", "tea", "dinner", "latenight"] },
+    { "code": "99000021", "name": "板烧鸡腿堡套餐", "category": "套餐", "price_fen": 3150, "kcal": 720, "protein_g": 30, "tags": ["热销"], "slots": ["lunch", "tea", "dinner", "latenight"], "is_combo": true },
+    { "code": "99000022", "name": "麦辣鸡腿堡套餐", "category": "套餐", "price_fen": 3250, "kcal": 780, "protein_g": 32, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"], "is_combo": true },
+    { "code": "99000023", "name": "巨无霸套餐", "category": "套餐", "price_fen": 3650, "kcal": 830, "protein_g": 35, "tags": [], "slots": ["lunch", "tea", "dinner", "latenight"], "is_combo": true },
+    { "code": "99000024", "name": "早餐全套（猪柳蛋麦满分+鲜煮咖啡）", "category": "套餐", "price_fen": 1900, "kcal": 400, "protein_g": 20, "tags": [], "slots": ["breakfast"], "is_combo": true }
+  ]
+}

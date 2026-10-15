@@ -1,0 +1,12 @@
+{
+  "_note": "演示数据：hours_left 相对加载时刻计算，保证演示永远新鲜；结构镜像麦当劳 MCP query-my-coupons / query-store-coupons 返回。",
+  "coupons": [
+    { "id": "C2026-001", "title": "免费甜筒券（任意消费可用）", "kind": "免费", "value_fen": 600, "applies_to": ["99000015"], "hours_left": 20 },
+    { "id": "C2026-002", "title": "满30减5（到店通用）", "kind": "满减", "value_fen": 500, "min_spend_fen": 3000, "hours_left": 40 },
+    { "id": "C2026-003", "title": "早餐档满15减3", "kind": "满减", "value_fen": 300, "min_spend_fen": 1500, "slots": ["breakfast"], "hours_left": 68 },
+    { "id": "C2026-004", "title": "薯条买一送一", "kind": "买一送一", "value_fen": 1300, "applies_to": ["99000010"], "hours_left": 120 },
+    { "id": "C2026-005", "title": "9.9元购板烧鸡腿堡", "kind": "固定价", "value_fen": 1060, "applies_to": ["99000001"], "hours_left": 150 },
+    { "id": "C2026-006", "title": "满50减12（到店通用）", "kind": "满减", "value_fen": 1200, "min_spend_fen": 5000, "hours_left": 300 },
+    { "id": "C2026-007", "title": "麦乐鸡加1元换购甜筒", "kind": "固定价", "value_fen": 500, "applies_to": ["99000015"], "hours_left": 400 }
+  ]
+}

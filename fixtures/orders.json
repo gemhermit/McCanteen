@@ -1,0 +1,31 @@
+{
+  "_note": "演示数据：days_ago/hour/minute 相对加载时刻解析，演示永远新鲜；结构镜像麦当劳 MCP order-list 返回。kcal 由餐品档案自动关联，无需手填。",
+  "orders": [
+    { "id": "M20260719-001", "days_ago": 88, "hour": 8, "minute": 12, "channel": "到店", "total_fen": 2300, "items": [ { "code": "99000007", "name": "猪柳蛋麦满分", "qty": 1 }, { "code": "99000019", "name": "鲜煮咖啡", "qty": 1 } ] },
+    { "id": "M20260721-002", "days_ago": 86, "hour": 12, "minute": 20, "channel": "到店", "total_fen": 2050, "items": [ { "code": "99000001", "name": "板烧鸡腿堡", "qty": 1 } ] },
+    { "id": "M20260724-003", "days_ago": 83, "hour": 12, "minute": 35, "channel": "到店", "total_fen": 3250, "items": [ { "code": "99000022", "name": "麦辣鸡腿堡套餐", "qty": 1 } ] },
+    { "id": "M20260727-004", "days_ago": 80, "hour": 15, "minute": 20, "channel": "到店", "total_fen": 1450, "items": [ { "code": "99000015", "name": "甜筒", "qty": 1 }, { "code": "99000016", "name": "菠萝派", "qty": 1 } ] },
+    { "id": "M20260730-005", "days_ago": 77, "hour": 12, "minute": 5, "channel": "到店", "total_fen": 4350, "items": [ { "code": "99000003", "name": "双层吉士堡", "qty": 1 }, { "code": "99000010", "name": "薯条（大）", "qty": 1 }, { "code": "99000018", "name": "可口可乐（大）", "qty": 1 } ] },
+    { "id": "M20260802-006", "days_ago": 74, "hour": 21, "minute": 40, "channel": "麦乐送", "total_fen": 2350, "items": [ { "code": "99000011", "name": "麦乐鸡（5块）", "qty": 1 }, { "code": "99000018", "name": "可口可乐（大）", "qty": 1 } ] },
+    { "id": "M20260805-007", "days_ago": 71, "hour": 12, "minute": 30, "channel": "到店", "total_fen": 3150, "items": [ { "code": "99000021", "name": "板烧鸡腿堡套餐", "qty": 1 } ] },
+    { "id": "M20260808-008", "days_ago": 68, "hour": 8, "minute": 5, "channel": "到店", "total_fen": 2350, "items": [ { "code": "99000008", "name": "烟肉蛋麦满分", "qty": 1 }, { "code": "99000019", "name": "鲜煮咖啡", "qty": 1 } ] },
+    { "id": "M20260811-009", "days_ago": 65, "hour": 12, "minute": 15, "channel": "到店", "total_fen": 2500, "items": [ { "code": "99000004", "name": "巨无霸", "qty": 1 } ] },
+    { "id": "M20260814-010", "days_ago": 62, "hour": 15, "minute": 10, "channel": "到店", "total_fen": 1200, "items": [ { "code": "99000017", "name": "麦旋风（奥利奥）", "qty": 1 } ] },
+    { "id": "M20260817-011", "days_ago": 59, "hour": 18, "minute": 20, "channel": "到店", "total_fen": 2800, "items": [ { "code": "99000005", "name": "麦香鱼", "qty": 1 }, { "code": "99000014", "name": "玉米杯（小）", "qty": 1 } ] },
+    { "id": "M20260820-012", "days_ago": 56, "hour": 12, "minute": 40, "channel": "到店", "total_fen": 3400, "items": [ { "code": "99000002", "name": "麦辣鸡腿堡", "qty": 1 }, { "code": "99000012", "name": "麦辣鸡翅（2块）", "qty": 1 } ] },
+    { "id": "M20260823-013", "days_ago": 53, "hour": 12, "minute": 25, "channel": "到店", "total_fen": 3750, "items": [ { "code": "99000021", "name": "板烧鸡腿堡套餐", "qty": 1 }, { "code": "99000015", "name": "甜筒", "qty": 1 } ] },
+    { "id": "M20260826-014", "days_ago": 50, "hour": 8, "minute": 20, "channel": "到店", "total_fen": 1900, "items": [ { "code": "99000009", "name": "热香饼（3块）", "qty": 1 }, { "code": "99000019", "name": "鲜煮咖啡", "qty": 1 } ] },
+    { "id": "M20260829-015", "days_ago": 47, "hour": 22, "minute": 10, "channel": "麦乐送", "total_fen": 2400, "items": [ { "code": "99000010", "name": "薯条（大）", "qty": 1 }, { "code": "99000018", "name": "可口可乐（大）", "qty": 1 } ] },
+    { "id": "M20260901-016", "days_ago": 44, "hour": 12, "minute": 10, "channel": "到店", "total_fen": 2350, "items": [ { "code": "99000006", "name": "不素之霸双层牛堡", "qty": 1 } ] },
+    { "id": "M20260904-017", "days_ago": 41, "hour": 17, "minute": 50, "channel": "到店", "total_fen": 3650, "items": [ { "code": "99000023", "name": "巨无霸套餐", "qty": 1 } ] },
+    { "id": "M20260907-018", "days_ago": 38, "hour": 12, "minute": 30, "channel": "到店", "total_fen": 3850, "items": [ { "code": "99000001", "name": "板烧鸡腿堡", "qty": 1 }, { "code": "99000013", "name": "脆薯饼", "qty": 1 }, { "code": "99000018", "name": "可口可乐（大）", "qty": 1 } ] },
+    { "id": "M20260910-019", "days_ago": 35, "hour": 15, "minute": 30, "channel": "到店", "total_fen": 600, "items": [ { "code": "99000015", "name": "甜筒", "qty": 1 } ] },
+    { "id": "M20260913-020", "days_ago": 32, "hour": 12, "minute": 20, "channel": "到店", "total_fen": 3250, "items": [ { "code": "99000022", "name": "麦辣鸡腿堡套餐", "qty": 1 } ] },
+    { "id": "M20260917-021", "days_ago": 28, "hour": 19, "minute": 5, "channel": "到店", "total_fen": 8650, "items": [ { "code": "99000021", "name": "板烧鸡腿堡套餐", "qty": 2 }, { "code": "99000011", "name": "麦乐鸡（5块）", "qty": 1 }, { "code": "99000018", "name": "可口可乐（大）", "qty": 1 } ] },
+    { "id": "M20260924-022", "days_ago": 21, "hour": 12, "minute": 15, "channel": "到店", "total_fen": 2050, "items": [ { "code": "99000001", "name": "板烧鸡腿堡", "qty": 1 } ] },
+    { "id": "M20261003-023", "days_ago": 12, "hour": 8, "minute": 30, "channel": "到店", "total_fen": 1900, "items": [ { "code": "99000024", "name": "早餐全套（猪柳蛋麦满分+鲜煮咖啡）", "qty": 1 } ] },
+    { "id": "M20261009-024", "days_ago": 6, "hour": 12, "minute": 25, "channel": "到店", "total_fen": 2600, "items": [ { "code": "99000012", "name": "麦辣鸡翅（2块）", "qty": 1 }, { "code": "99000010", "name": "薯条（大）", "qty": 1 } ] },
+    { "id": "M20261011-025", "days_ago": 4, "hour": 12, "minute": 30, "channel": "到店", "total_fen": 2050, "items": [ { "code": "99000001", "name": "板烧鸡腿堡", "qty": 1 } ] },
+    { "id": "M20261014-026", "days_ago": 1, "hour": 12, "minute": 20, "channel": "到店", "total_fen": 2050, "items": [ { "code": "99000001", "name": "板烧鸡腿堡", "qty": 1 } ] }
+  ]
+}

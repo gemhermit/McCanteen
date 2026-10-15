@@ -1,0 +1,6 @@
+{
+  "_note": "演示数据：积分账户结构镜像麦当劳 MCP query-my-account 返回。",
+  "available_points": 8560,
+  "expiring_points": 1200,
+  "expiring_in_hours": 96
+}
