@@ -26,7 +26,8 @@ life_path = tmp / "life.png"
 render_life_card(life_profile(fx.orders, now=NOW), str(life_path))
 img = Image.open(life_path)
 check(img.size == (1200, 1600), "尺寸 1200×1600")
-check(img.getpixel((10, 10))[:3] == (218, 41, 28), "头部为麦当劳红")
+px = img.getpixel((10, 10))[:3]
+check(px[0] > 170 and px[0] > px[1] * 2.5 and px[0] > px[2] * 2.5, f"头部为红色系（{px}，渐变红头）")
 check(img.getpixel((600, 1520))[:3] != (255, 255, 255), "页脚区域有内容（非纯白）")
 check(life_path.stat().st_size > 30_000, "PNG 体积合理（>30KB）")
 
@@ -36,7 +37,8 @@ dec_path = tmp / "decide.png"
 render_decide_card(dec, str(dec_path))
 img2 = Image.open(dec_path)
 check(img2.size == (1200, 1600), "尺寸 1200×1600")
-check(img2.getpixel((10, 10))[:3] == (218, 41, 28), "头部为麦当劳红")
+px2 = img2.getpixel((10, 10))[:3]
+check(px2[0] > 170 and px2[0] > px2[1] * 2.5 and px2[0] > px2[2] * 2.5, f"头部为红色系（{px2}，渐变红头）")
 
 section("摇一摇饭卡（印章路径）")
 import random  # noqa: E402

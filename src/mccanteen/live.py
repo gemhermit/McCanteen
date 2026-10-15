@@ -449,7 +449,13 @@ def fetch_live(
     # 3. 菜单 code 列表
     menu_codes: List[Tuple[str, str]] = []
     try:
-        menu_codes = parse_menu_codes(call("query-meals", store_args))
+        menu_text = call("query-meals", store_args)
+        menu_data = extract_embedded_json(menu_text)
+        if menu_data and menu_data.get("success") is False:
+            raise RuntimeError(f"门店菜单查询失败：{menu_data.get('message')}（code {menu_data.get('code')}）")
+        menu_codes = parse_menu_codes(menu_text)
+    except RuntimeError:
+        raise
     except Exception as e:  # noqa: BLE001
         warnings.append(f"query-meals 失败：{e}")
     if not menu_codes:
