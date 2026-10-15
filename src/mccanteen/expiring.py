@@ -29,7 +29,11 @@ class Bucket:
 
     @property
     def face_value(self) -> float:
-        return round(sum(c.face_value for c in self.coupons), 2)
+        return round(sum(c.face_value for c in self.coupons if c.face_known), 2)
+
+    @property
+    def unknown_count(self) -> int:
+        return sum(1 for c in self.coupons if not c.face_known)
 
 
 @dataclass
@@ -38,7 +42,8 @@ class ExpiringReport:
     long_term_count: int          # 长期有效券数量（不计入沉默成本）
     expiring_points: int
     points_in_hours: Optional[float]
-    silent_cost_yuan: float       # 48 小时内过期券面值合计
+    silent_cost_yuan: float       # 48 小时内过期券的已核实面值合计
+    unknown_face_count: int       # 48 小时内过期但面值待核实的券数
     verdict: str
 
 
@@ -69,7 +74,8 @@ def expiring_report(
             long_term += 1
 
     urgent = by_label["24 小时内"].coupons + by_label["48 小时内"].coupons
-    silent = round(sum(c.face_value for c in urgent), 2)
+    silent = round(sum(c.face_value for c in urgent if c.face_known), 2)
+    unknown = sum(1 for c in urgent if not c.face_known)
 
     points = 0
     points_hours: Optional[float] = None
@@ -78,7 +84,11 @@ def expiring_report(
         points_hours = account.expiring_in_hours
 
     if urgent:
-        parts = [f"{len(urgent)} 张券将在 48 小时内过期，面值合计 {fmt_yuan(silent)}"]
+        parts = [f"{len(urgent)} 张券将在 48 小时内过期"]
+        if silent > 0:
+            parts.append(f"已核实面值合计 {fmt_yuan(silent)}")
+        if unknown:
+            parts.append(f"另有 {unknown} 张面值待核实（菜单无原价对照，同样在蒸发）")
         if points:
             when = f"{int(points_hours)} 小时内" if points_hours is not None else "不久后"
             parts.append(f"另有 {points} 积分将在{when}过期")
@@ -94,5 +104,6 @@ def expiring_report(
         expiring_points=points,
         points_in_hours=points_hours,
         silent_cost_yuan=silent,
+        unknown_face_count=unknown,
         verdict=verdict,
     )

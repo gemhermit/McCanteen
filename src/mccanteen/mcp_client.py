@@ -60,7 +60,9 @@ class McdonaldsMCP:
 
     @staticmethod
     def _parse_body(body: str) -> Dict[str, Any]:
-        """响应可能是纯 JSON 或 SSE 帧（event: message / data: {...}）。"""
+        """响应可能是纯 JSON、SSE 帧（data: {...}）或空 body（通知类请求返回 204/空）。"""
+        if not body.strip():
+            return {}
         for line in body.splitlines():
             if line.startswith("data:"):
                 return json.loads(line[len("data:"):].strip())

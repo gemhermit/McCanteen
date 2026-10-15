@@ -62,6 +62,7 @@ class Coupon:
     slots: Tuple[str, ...] = ()        # 空 = 全时段可用
     channels: Tuple[str, ...] = ()     # 空 = 全渠道可用
     hours_left: Optional[float] = None  # None = 长期有效
+    face_known: bool = True             # False = 面值待核实（live 下菜单无原价对照），不计入沉默成本
 
     @property
     def face_value(self) -> float:

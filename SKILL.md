@@ -26,10 +26,12 @@ agent_created: true
 
 ### 1. 决断（默认链路）
 
-1. 判断当前时段（`now-time-info`，或本地时间）。时段定义见 `references/decide-rules.md`。
-2. 取数据：优先 live MCP（`query-nearby-stores` → `query-meals` → `query-my-coupons`）；
-   未配置 Token 时用 `fixtures/` 演示数据，并明确告知用户「当前为演示数据」。
-3. 运行 `python scripts/mcd_decide.py --context "<用户处境>" [--budget N] [--json]`。
+1. 判断当前时段（live 用 `now-time-info`，离线用本机时间）。时段定义见 `references/decide-rules.md`。
+2. 取数据：
+   - **live**（用户已配置 `mcd-mcp` 连接器或 `MCD_MCP_TOKEN`）：调用 `fetch_live()`
+     （`src/mccanteen/live.py`，8 类接口 15 次调用拿全：时间/门店/菜单/批量计价/营养库/两类券/积分/订单）；
+   - **离线**：用 `fixtures/` 演示数据，并明确告知用户「当前为演示数据」。
+3. 运行 `python scripts/mcd_decide.py --context "<用户处境>" [--budget N] [--live] [--json]`。
 4. 输出：结论一句 + 3 个候选（名称 / 价格 / 用券后价格 / 理由）。
 5. 用户要图时加 `--card <路径>` 生成今日饭卡 PNG。
 
@@ -54,9 +56,10 @@ agent_created: true
 ## MCP 工具规则
 
 1. **只用官方 MCP 拿数据**：餐品、价格、门店、券、积分、订单。模型不得凭记忆报价格。
-2. **价格单位为分**：展示前必须经 `models.fen_to_yuan()` 换算。
-3. **未核实不报价**：live 数据缺失时标注「价格未核实」，禁用 fixtures 价格冒充实时价。
-4. **下单铁律**：`create-order` 仅在用户明确说出「确认下单」后调用；商品/门店/价格任一变化，确认即失效，必须重新确认。创建订单 ≠ 支付成功，不得代替用户支付。
+2. **价格单位为分**：展示前必须经 `models.fen_to_yuan()` 换算；live 下名称与价格由 `calculate-price` 批量回填。
+3. **live 响应有两种包装**（Markdown+内嵌 JSON / 纯 Markdown 券列表），解析只走 `live.py` 的解析器，不要在提示词里手抠 JSON。
+4. **未核实不报价**：live 数据缺失或券面值无法对照菜单原价时，标注「面值待核实」，禁用 fixtures 价格冒充实时价。
+5. **下单铁律**：`create-order` 仅在用户明确说出「确认下单」后调用；商品/门店/价格任一变化，确认即失效，必须重新确认。创建订单 ≠ 支付成功，不得代替用户支付。
 
 ## 安全与合规
 

@@ -1,0 +1,1 @@
+{"success":true,"code":200,"message":"请求成功","datetime":"2026-10-15 16:16:00","traceId":"eee","data":{"categories":[{"name":"人气热卖","meals":[{"code":"9900005462","tags":["套餐"]},{"code":"4810","tags":[]}]},{"name":"小食","meals":[{"code":"9900012387","tags":[]}]}]}}

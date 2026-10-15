@@ -4,7 +4,7 @@
 
 ![MIT](https://img.shields.io/badge/license-MIT-yellow)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
-![tests](https://img.shields.io/badge/tests-101%20passed-brightgreen)
+![tests](https://img.shields.io/badge/tests-130%20passed-brightgreen)
 ![runtime deps](https://img.shields.io/badge/runtime%20deps-Pillow%20only-success)
 ![McDonald's MCP](https://img.shields.io/badge/McDonald's%20MCP-integrated-DA291C)
 ![WorkBuddy Skill](https://img.shields.io/badge/WorkBuddy-Skill-blueviolet)
@@ -62,6 +62,27 @@ $ python scripts/mcd_decide.py --slot tea --context "下午摸鱼，想喝点什
 
 **注意 ① 是怎么赢的**：不是因为甜筒多好吃，而是因为那张免费甜筒券 20 小时后过期——
 优惠引导 + 损失厌恶，让食堂把「止损」融进了每一次决断。
+
+### 以上不只是演示——live 模式已用真实 MCP 跑通
+
+配上 Token（`export MCD_MCP_TOKEN=...`），同一个引擎吃的是**真实门店、真实菜单、真实价格、真实券**：
+
+```
+$ python scripts/mcd_decide.py --live --context "加班到九点好累"
+
+[live] 麦当劳杭州都尚超市餐厅 · 菜单 124 项 · 券 6 张 · 订单 1 笔 · MCP 调用 15 次
+🍱 下午茶 · 三点几啦，饮茶先啦！
+食堂大叔拍板：中薯条。三点几啦，饮茶先啦！（另外，你有 4 张券 48 小时内过期，已核实面值 ¥13.5，3 张面值待核实，别让它蒸发了）
+
+① 中薯条  ¥13.5
+   可用「中薯条买一送一」→ 用券后 ¥0
+   · 该券 31 小时内过期，用了就是止损
+```
+
+![live 模式真实数据饭卡](examples/live-decide-card.png)
+
+（这张卡是 2026-10-15 用真实 MCP 数据生成的：附近门店、124 项真实菜单、6 张真实券、
+4 张临期券。live 全链路 = 8 类接口 15 次调用，实测通过。）
 
 * * *
 
@@ -167,6 +188,7 @@ McCanteen/
 │   ├── timeslots.py              # 五时段判断（含跨午夜夜宵档）
 │   ├── fixtures.py               # 演示数据加载（离线可跑）
 │   ├── mcp_client.py             # 麦当劳 MCP 客户端（Streamable HTTP / JSON-RPC）
+│   ├── live.py                   # live 适配层：真实 MCP 响应 → 内部模型
 │   ├── decide.py                 # 决断引擎（打分/券加权/反重复/摇一摇）
 │   ├── shake.py                  # secrets 真随机
 │   ├── expiring.py               # 止损雷达（分桶/沉默成本）
@@ -176,7 +198,8 @@ McCanteen/
 │   ├── mcd_decide.py / mcd_shake.py / mcd_expiring.py / mcd_life.py
 ├── references/                   # decide-rules / mcp-contracts / card-design
 ├── fixtures/                     # 演示数据（24 餐品 / 7 券 / 26 订单）
-├── tests/                        # 零依赖测试，6 个文件 101 项断言
+├── tests/                        # 零依赖测试，7 个文件 130 项断言
+│   └── fixtures/live/            # live 解析器测试样本（合成数据）
 └── examples/                     # 示例卡片与演示实录
 ```
 
@@ -216,8 +239,11 @@ python scripts/mcd_shake.py                       # 选择困难症发作时
 python scripts/mcd_expiring.py                    # 看看正在蒸发的钱
 python scripts/mcd_life.py --card my-mclife.png   # 生成你的角色卡
 
-# 真实数据冒烟（需 MCD_MCP_TOKEN 环境变量）
+# 真实数据（需 MCD_MCP_TOKEN 环境变量，8 类接口 15 次调用拿全 live 数据集）
 python scripts/mcd_decide.py --live
+python scripts/mcd_decide.py --live --store 3330086   # 指定门店
+python scripts/mcd_expiring.py --live
+python scripts/mcd_life.py --live
 ```
 
 ### 5. 在对话中触发
@@ -242,27 +268,30 @@ python tests/run_all.py
 | `test_decide.py` | 20 | 沉默成本识别、券加权、过期加急、反重复、处境匹配、摇一摇确定性 |
 | `test_expiring.py` | 12 | 分桶、沉默成本、结论文案、空态 |
 | `test_life.py` | 27 | 统计口径、等级台阶、属性、成就、空档案 |
+| `test_live.py` | 29 | live 解析器：两种响应包装、券 Markdown、时段窗、面值待核实、订单/账户（合成样本，零网络） |
 | `test_cardgen.py` | 8 | 真实渲染 PNG、尺寸、像素校验、降级分支 |
 
-**当前结果：101 / 101 全部通过**（Python 3.13 实测；零网络依赖，卡片测试在临时目录产出真实 PNG）。
+**当前结果：130 / 130 全部通过**（Python 3.13 实测；零网络依赖，卡片测试在临时目录产出真实 PNG）。
 
 ## 能力现状：已验证 / 未验证 / 已知限制
 
 ### ✅ 已验证
 
-- 全部引擎逻辑（打分/分桶/RPG 映射）与 101 项断言；
+- 全部引擎逻辑（打分/分桶/RPG 映射）与 130 项断言；
+- **live 全链路**：真实 Token 跑通 8 类接口（15 次调用）→ 决断 / 止损 / 人生三链路，并用真实数据生成饭卡（见上文）；
 - 两张卡片真实渲染（1200×1600，像素级校验）；
-- 降级路径：无 Token → fixtures 演示；预算内无解 → 放宽并说明；餐品视觉缺失 → 不静默失败。
+- 降级路径：无 Token → fixtures 演示；预算内无解 → 放宽并说明；计价失败商品自动剔除；大批量计价被断连 → 自动拆细重试。
 
 ### ⚠️ 未验证 / 规划中
 
-- **live MCP 数据解析适配**：客户端协议已实现，但 `query-my-coupons` 等接口可能返回 Markdown 文本，字段映射需按真实返回校准（见 `references/mcp-contracts.md`）；
 - **`create-order` 下单闭环**：规划中。上线前必须实现「明确确认才下单」铁律——创建订单 ≠ 支付成功；
 - `campaign-calendar` 活动节奏建议：规划中。
 
 ### 已知限制
 
 - 演示数据（fixtures）为结构镜像，**不是实时价格**；真实价格以门店实时查询为准；
+- 菜单随时段变化：早餐券在午/晚餐时段查不到菜单原价，面值标记「待核实」而不是按 0 计入沉默成本；
+- live 餐品无法从菜单接口判断时段可得性，候选默认全时段；
 - 积分与人民币的换算关系未经官方确认，止损雷达只报积分不折算金额。
 
 ## 安全、隐私与免责

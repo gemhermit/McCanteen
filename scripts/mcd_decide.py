@@ -4,7 +4,8 @@
 示例：
   python scripts/mcd_decide.py --context "加班到九点好累"
   python scripts/mcd_decide.py --budget 25 --slot tea --card out.png
-  python scripts/mcd_decide.py --live     # 连通性冒烟（需 MCD_MCP_TOKEN）
+  python scripts/mcd_decide.py --live            # 真实 MCP 数据（需 MCD_MCP_TOKEN）
+  python scripts/mcd_decide.py --live --store 3330086
 """
 import argparse
 import json
@@ -19,6 +20,21 @@ from mccanteen.decide import Context, decide
 from mccanteen.fixtures import load_fixtures
 from mccanteen.models import fmt_yuan
 
+MEDALS = ["①", "②", "③"]
+
+
+def _print_decision(decision) -> None:
+    print(f"🍱 {decision.slot.label} · {decision.slot.persona}")
+    print(decision.verdict)
+    print()
+    for i, o in enumerate(decision.options[:3]):
+        print(f"{MEDALS[i]} {o.meal.name}  {fmt_yuan(o.meal.price)}")
+        if o.coupon is not None:
+            print(f"   可用「{o.coupon.title}」→ 用券后 {fmt_yuan(o.net_price)}")
+        for r in o.reasons:
+            print(f"   · {r}")
+        print()
+
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="麦门食堂 · 今天吃什么")
@@ -28,22 +44,28 @@ def main() -> int:
     ap.add_argument("--allow-repeat", action="store_true", help="关闭反重复，允许推荐最近吃过的")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
     ap.add_argument("--card", default=None, help="生成今日饭卡 PNG 路径")
-    ap.add_argument("--live", action="store_true", help="连通性冒烟（需 MCD_MCP_TOKEN）")
+    ap.add_argument("--live", action="store_true", help="真实 MCP 数据（需 MCD_MCP_TOKEN）")
+    ap.add_argument("--store", default=None, help="指定门店 storeCode（live 模式，缺省取附近首家）")
     args = ap.parse_args()
 
+    ctx = Context(text=args.context, budget=args.budget, slot=args.slot, avoid_repeat=not args.allow_repeat)
+
     if args.live:
+        from mccanteen.live import fetch_live
         from mccanteen.mcp_client import McdonaldsMCP
 
         try:
-            print(json.dumps(McdonaldsMCP().smoke_test(), ensure_ascii=False, indent=2))
-            return 0
+            data = fetch_live(McdonaldsMCP(), store_code=args.store)
         except Exception as e:  # noqa: BLE001
-            print(f"[live] MCP 冒烟失败：{e}", file=sys.stderr)
+            print(f"[live] 拉取失败：{e}", file=sys.stderr)
             return 1
-
-    fx = load_fixtures()
-    ctx = Context(text=args.context, budget=args.budget, slot=args.slot, avoid_repeat=not args.allow_repeat)
-    decision = decide(fx.meals, fx.coupons, fx.orders, ctx=ctx)
+        print(f"[live] {data.store.name} · 菜单 {len(data.meals)} 项 · 券 {len(data.coupons)} 张 · 订单 {len(data.orders)} 笔 · MCP 调用 {data.calls} 次")
+        for w in data.warnings:
+            print(f"[live][warn] {w}")
+        decision = decide(data.meals, data.coupons, data.orders, ctx=ctx, now=data.now)
+    else:
+        fx = load_fixtures()
+        decision = decide(fx.meals, fx.coupons, fx.orders, ctx=ctx)
 
     if args.json:
         payload = {
@@ -66,17 +88,7 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0
 
-    medals = ["①", "②", "③"]
-    print(f"🍱 {decision.slot.label} · {decision.slot.persona}")
-    print(decision.verdict)
-    print()
-    for i, o in enumerate(decision.options[:3]):
-        print(f"{medals[i]} {o.meal.name}  {fmt_yuan(o.meal.price)}")
-        if o.coupon is not None:
-            print(f"   可用「{o.coupon.title}」→ 用券后 {fmt_yuan(o.net_price)}")
-        for r in o.reasons:
-            print(f"   · {r}")
-        print()
+    _print_decision(decision)
 
     if args.card:
         render_decide_card(decision, args.card)

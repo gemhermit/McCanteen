@@ -27,11 +27,13 @@
 | 测试 | 6 个测试文件 101 项断言，全部通过；期间修复 3 处问题（decide.py 列表闭合符、满减券适用性断言写反、止损分桶计数口径） |
 | 卡片 | Pillow 程序排版生成 3 张示例卡（人生角色卡 / 今日饭卡 / 摇一摇饭卡），逐张目检迭代（补常驻单品行、修标点叠用、印章旋转） |
 | 文档 | README（差异化对照表 + 演示实录 + 诚实的能力现状）、MCP_INTEGRATION.md（调用流程 + 契约 + 实测状态） |
+| **live 验证** | 用户提供本地已配置的 `mcd-mcp`（Token 走环境变量，未落盘）。真实跑通 8 类接口：修复空 body 解析崩溃；实测发现无 Session-ID、两种响应包装、`productCode` 字段名、批量计价上限（60 个被断连 → 20/块 + 拆细重试）、早餐券无菜单原价对照 → 新增「面值待核实」口径。新增 `live.py` 适配层 + `test_live.py` 29 项解析器断言（合成样本零网络回归）。live 全链路 15 次调用实测通过，并用真实数据生成饭卡 |
 
 ## 关键数字（与 README 一致，均由脚本实测得出）
 
-- 测试断言：**101 / 101 通过**（test_models 16 + test_timeslots 18 + test_decide 20 + test_expiring 12 + test_life 27 + test_cardgen 8）
+- 测试断言：**130 / 130 通过**（test_models 16 + test_timeslots 18 + test_decide 20 + test_expiring 12 + test_life 27 + test_live 29 + test_cardgen 8）
 - fixtures：24 个餐品 / 7 张券 / 26 笔订单 / 2 家门店
+- live 实测（2026-10-15）：附近门店 1 家、菜单 128 code（过滤加购项后 124 项）、账户券 8 张 + 门店券 2 张（去重 6 张）、历史订单 1 笔、MCP 调用 15 次
 - 卡片：1200×1600 PNG，程序排版，无图像生成 API 依赖
 
 ## 合规声明

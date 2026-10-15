@@ -291,8 +291,13 @@ def render_decide_card(decision: Decision, out_path: str) -> str:
     # 底部：沉默成本
     band_y = 1240
     d.rounded_rectangle([60, band_y, 1140, band_y + 120], radius=20, fill=YELLOW if decision.silent_cost_yuan > 0 else (232, 245, 233))
-    if decision.silent_cost_yuan > 0:
-        line = f"你还有 {decision.urgent_coupon_count} 张券 48 小时内过期，面值 {fmt_yuan(decision.silent_cost_yuan)}——别让它蒸发了"
+    if decision.silent_cost_yuan > 0 or decision.urgent_coupon_count > 0:
+        parts = [f"你还有 {decision.urgent_coupon_count} 张券 48 小时内过期"]
+        if decision.silent_cost_yuan > 0:
+            parts.append(f"已核实面值 {fmt_yuan(decision.silent_cost_yuan)}")
+        if getattr(decision, "unknown_face_count", 0):
+            parts.append(f"{decision.unknown_face_count} 张面值待核实")
+        line = "，".join(parts) + "——别让它蒸发了"
         color = DARK
     else:
         line = "暂无即将过期的券，安心吃"

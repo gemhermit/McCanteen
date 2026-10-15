@@ -11,6 +11,7 @@ TEST_FILES = [
     "test_decide.py",
     "test_expiring.py",
     "test_life.py",
+    "test_live.py",
     "test_cardgen.py",
 ]
 

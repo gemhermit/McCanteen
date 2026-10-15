@@ -21,21 +21,25 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="麦门食堂 · 麦门人生")
     ap.add_argument("--card", default=None, help="生成角色卡 PNG 路径")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
-    ap.add_argument("--live", action="store_true", help="连通性冒烟（需 MCD_MCP_TOKEN）")
+    ap.add_argument("--live", action="store_true", help="真实 MCP 数据（需 MCD_MCP_TOKEN）")
     args = ap.parse_args()
 
     if args.live:
+        from mccanteen.live import fetch_live
         from mccanteen.mcp_client import McdonaldsMCP
 
         try:
-            print(json.dumps(McdonaldsMCP().smoke_test(), ensure_ascii=False, indent=2))
-            return 0
+            data = fetch_live(McdonaldsMCP())
         except Exception as e:  # noqa: BLE001
-            print(f"[live] MCP 冒烟失败：{e}", file=sys.stderr)
+            print(f"[live] 拉取失败：{e}", file=sys.stderr)
             return 1
-
-    fx = load_fixtures()
-    p = life_profile(fx.orders)
+        print(f"[live] {data.store.name} · 订单 {len(data.orders)} 笔 · MCP 调用 {data.calls} 次")
+        for w in data.warnings:
+            print(f"[live][warn] {w}")
+        p = life_profile(data.orders, now=data.now)
+    else:
+        fx = load_fixtures()
+        p = life_profile(fx.orders)
 
     if args.json:
         payload = {

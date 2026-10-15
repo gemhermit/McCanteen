@@ -19,21 +19,25 @@ from mccanteen.models import fmt_yuan
 def main() -> int:
     ap = argparse.ArgumentParser(description="麦门食堂 · 止损雷达")
     ap.add_argument("--json", action="store_true", help="输出 JSON")
-    ap.add_argument("--live", action="store_true", help="连通性冒烟（需 MCD_MCP_TOKEN）")
+    ap.add_argument("--live", action="store_true", help="真实 MCP 数据（需 MCD_MCP_TOKEN）")
     args = ap.parse_args()
 
     if args.live:
+        from mccanteen.live import fetch_live
         from mccanteen.mcp_client import McdonaldsMCP
 
         try:
-            print(json.dumps(McdonaldsMCP().smoke_test(), ensure_ascii=False, indent=2))
-            return 0
+            data = fetch_live(McdonaldsMCP())
         except Exception as e:  # noqa: BLE001
-            print(f"[live] MCP 冒烟失败：{e}", file=sys.stderr)
+            print(f"[live] 拉取失败：{e}", file=sys.stderr)
             return 1
-
-    fx = load_fixtures()
-    report = expiring_report(fx.coupons, fx.account)
+        print(f"[live] {data.store.name} · 券 {len(data.coupons)} 张 · MCP 调用 {data.calls} 次")
+        for w in data.warnings:
+            print(f"[live][warn] {w}")
+        report = expiring_report(data.coupons, data.account, now=data.now)
+    else:
+        fx = load_fixtures()
+        report = expiring_report(fx.coupons, fx.account)
 
     if args.json:
         payload = {
@@ -53,10 +57,12 @@ def main() -> int:
     print("⏳ 止损雷达 —— 正在蒸发的钱，量化给你看")
     for b in report.buckets:
         if b.coupons:
-            print(f"\n{b.label}（{len(b.coupons)} 张 · 面值 {fmt_yuan(b.face_value)}）")
+            extra = f" · {b.unknown_count} 张面值待核实" if b.unknown_count else ""
+            print(f"\n{b.label}（{len(b.coupons)} 张 · 已核实面值 {fmt_yuan(b.face_value)}{extra}）")
             for c in b.coupons:
                 when = f"{int(c.hours_left)} 小时后过期" if c.hours_left is not None else "长期有效"
-                print(f"  · {c.title}  {fmt_yuan(c.face_value)} · {when}")
+                face = fmt_yuan(c.face_value) if c.face_known else "面值待核实"
+                print(f"  · {c.title}  {face} · {when}")
     print(f"\n长期有效：{report.long_term_count} 张")
     if report.expiring_points:
         when = f"{int(report.points_in_hours)} 小时内" if report.points_in_hours is not None else "不久后"

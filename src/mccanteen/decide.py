@@ -24,7 +24,7 @@ URGENT_HOURS = 48
 CONTEXT_RULES = [
     (("健身", "减脂", "减肥", "低卡", "控卡", "轻食", "沙拉"), "light"),
     (("累", "加班", "熬夜", "emo", "低落", "烦躁", "垮", "心累"), "comfort"),
-    (("渴", "热", "喝水", "饮料", "可乐"), "drink"),
+    (("渴", "热", "喝水", "饮料", "可乐", "想喝", "喝点", "喝什么", "喝啥"), "drink"),
     (("请客", "聚餐", "团建", "分享", "聚会"), "share"),
     (("困", "提神", "咖啡", "犯困"), "coffee"),
 ]
@@ -56,6 +56,7 @@ class Decision:
     silent_cost_yuan: float
     urgent_coupon_count: int
     verdict: str
+    unknown_face_count: int = 0
     budget_relaxed: bool = False
 
 
@@ -145,7 +146,8 @@ def decide(
     slot = timeslots.slot_by_key(ctx.slot) if ctx.slot else timeslots.slot_for(now)
 
     urgent = [c for c in coupons if c.hours_left is not None and c.hours_left <= URGENT_HOURS]
-    silent_cost = sum(c.face_value for c in urgent)
+    silent_cost = sum(c.face_value for c in urgent if c.face_known)
+    unknown_face = sum(1 for c in urgent if not c.face_known)
 
     recent_cutoff = now - timedelta(days=REPEAT_WINDOW_DAYS)
     recent_codes = {code for o in orders if o.created_at >= recent_cutoff for code in o.codes()}
@@ -188,8 +190,13 @@ def decide(
     else:
         winner = top[0].meal.name
         verdict = f"食堂大叔拍板：{winner}。{slot.persona}".rstrip("。")
-        if silent_cost > 0:
-            verdict += f"（另外，你有 {len(urgent)} 张券 48 小时内过期，面值 {fmt_yuan(silent_cost)}，别让它蒸发了）"
+        if urgent:
+            parts = [f"你有 {len(urgent)} 张券 48 小时内过期"]
+            if silent_cost > 0:
+                parts.append(f"已核实面值 {fmt_yuan(silent_cost)}")
+            if unknown_face:
+                parts.append(f"{unknown_face} 张面值待核实")
+            verdict += "（另外，" + "，".join(parts) + "，别让它蒸发了）"
         if budget_relaxed:
             verdict += "（预算内没有可点的，已放宽预算，量力而行）"
 
@@ -200,6 +207,7 @@ def decide(
         shake=shake,
         silent_cost_yuan=round(silent_cost, 2),
         urgent_coupon_count=len(urgent),
+        unknown_face_count=unknown_face,
         verdict=verdict,
         budget_relaxed=budget_relaxed,
     )
