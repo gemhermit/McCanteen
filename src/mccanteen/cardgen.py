@@ -195,61 +195,153 @@ def _chip(img: Image.Image, x: int, y: int, text: str, font: ImageFont.FreeTypeF
     return w
 
 
-# ————————————————— 汉堡吉祥物（会笑的那位） —————————————————
+# ————————————————— 汉堡吉祥物（分层渐变合成，会笑的那位） —————————————————
 
 
-def draw_burger(draw: ImageDraw.ImageDraw, cx: int, cy: int, r: int) -> None:
-    bun = (238, 180, 110)
-    bun_light = (246, 198, 136)
-    lettuce = (126, 182, 68)
-    cheese = (255, 208, 92)
-    patty = (124, 80, 56)
+def _sesame(canvas: Image.Image, x: float, y: float, w: int, h: int, angle: float) -> None:
+    """粘贴一粒旋转的杏仁形芝麻。"""
+    s = Image.new("RGBA", (w * 3, h * 3), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(s)
+    sd.ellipse([w, h, w * 2, h * 2], fill=(252, 231, 178), outline=(226, 196, 140), width=1)
+    s = s.rotate(angle, expand=True, resample=Image.BICUBIC)
+    canvas.alpha_composite(s, (int(x - s.size[0] / 2), int(y - s.size[1] / 2)))
 
-    # 下层面包（先画，压层）
-    draw.pieslice([cx - r * 0.82, cy + r * 0.42, cx + r * 0.82, cy + r * 0.98], 0, 180, fill=bun)
-    # 肉饼
-    draw.rounded_rectangle([cx - r * 0.85, cy + r * 0.28, cx + r * 0.85, cy + r * 0.46], radius=r * 0.09, fill=patty)
-    # 芝士（带流心下垂）
-    draw.polygon(
-        [
-            (cx - r * 0.80, cy + r * 0.12),
-            (cx + r * 0.80, cy + r * 0.12),
-            (cx + r * 0.80, cy + r * 0.24),
-            (cx + r * 0.45, cy + r * 0.18),
-            (cx + r * 0.28, cy + r * 0.32),
-            (cx + r * 0.10, cy + r * 0.18),
-            (cx - r * 0.14, cy + r * 0.30),
-            (cx - r * 0.32, cy + r * 0.18),
-            (cx - r * 0.55, cy + r * 0.28),
-            (cx - r * 0.80, cy + r * 0.20),
-        ],
-        fill=cheese,
-    )
-    # 生菜（波浪边）
-    draw.rectangle([cx - r * 0.86, cy + r * 0.0, cx + r * 0.86, cy + r * 0.12], fill=lettuce)
-    for i in range(-4, 5):
-        x = cx + i * r * 0.21
-        draw.ellipse([x - r * 0.12, cy + r * 0.08, x + r * 0.12, cy + r * 0.20], fill=lettuce)
-    # 上层面包
-    draw.pieslice([cx - r * 0.82, cy - r * 0.96, cx + r * 0.82, cy + r * 0.04], 180, 360, fill=bun_light)
-    # 芝麻
-    for dx, dy in [(-0.36, -0.50), (0.0, -0.62), (0.36, -0.50), (-0.17, -0.34), (0.19, -0.34)]:
-        draw.ellipse(
-            [cx + r * dx - r * 0.05, cy + r * dy - r * 0.03, cx + r * dx + r * 0.05, cy + r * dy + r * 0.03],
-            fill=(252, 230, 176),
+
+def _soft_highlight(canvas: Image.Image, box: Tuple[int, int, int, int], alpha: int = 80, blur: int = 10) -> None:
+    """柔和白色高光（模糊椭圆）。"""
+    x0, y0, x1, y1 = box
+    w, h = max(1, x1 - x0), max(1, y1 - y0)
+    hl = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    hd = ImageDraw.Draw(hl)
+    hd.ellipse([0, 0, w - 1, h - 1], fill=(255, 255, 255, alpha))
+    hl = hl.filter(ImageFilter.GaussianBlur(blur))
+    canvas.alpha_composite(hl, (x0, y0))
+
+
+def draw_burger(img: Image.Image, cx: int, cy: int, r: int) -> None:
+    """在 img 上分层合成汉堡吉祥物。
+
+    自底向上：下层面包 → 肉饼 → 芝士 → 生菜 → 上层面包，
+    每层独立渐变 + 卡通描边；随后点缀芝麻、烤痕、高光，最后画表情。
+    """
+    R = float(r)
+    size = int(R * 2.8)
+    X = Y = size / 2.0
+    canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    OUT = (112, 68, 44, 255)  # 卡通描边色
+
+    def _layer(shape, top: Tuple[int, int, int], bottom: Tuple[int, int, int], outline: bool = True) -> None:
+        if outline:
+            dark = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+            shape(ImageDraw.Draw(dark), 3.0, OUT)
+            canvas.alpha_composite(dark)
+        grad = _gradient((size, size), top, bottom)
+        mask = Image.new("L", (size, size), 0)
+        shape(ImageDraw.Draw(mask), 0.0, 255)
+        canvas.paste(grad, (0, 0), mask)
+
+    # —— 下层面包 ——
+    def s_bottom_bun(d, g, fill):
+        d.pieslice(
+            [X - 0.84 * R - g, Y + 0.40 * R, X + 0.84 * R + g, Y + 1.04 * R + g],
+            0, 180, fill=fill,
         )
 
-    # —— 表情（吉祥物的灵魂）——
-    eye_y = cy - r * 0.26
-    for ex in (cx - r * 0.22, cx + r * 0.22):
-        draw.ellipse([ex - r * 0.06, eye_y - r * 0.06, ex + r * 0.06, eye_y + r * 0.06], fill=(62, 42, 32))
-        draw.ellipse([ex - r * 0.02, eye_y - r * 0.04, ex + r * 0.02, eye_y + r * 0.0], fill=WHITE)
-    for bx in (cx - r * 0.40, cx + r * 0.40):
-        draw.ellipse([bx - r * 0.075, eye_y + r * 0.10, bx + r * 0.075, eye_y + r * 0.19], fill=(244, 168, 138))
-    draw.arc(
-        [cx - r * 0.11, eye_y - r * 0.02, cx + r * 0.11, eye_y + r * 0.14],
-        25, 155, fill=(62, 42, 32), width=max(2, int(r * 0.028)),
+    _layer(s_bottom_bun, (243, 190, 122), (213, 148, 88))
+
+    # —— 肉饼（带烤痕） ——
+    def s_patty(d, g, fill):
+        d.rounded_rectangle(
+            [X - 0.88 * R - g, Y + 0.27 * R - g, X + 0.88 * R + g, Y + 0.47 * R + g],
+            radius=0.10 * R + g, fill=fill,
+        )
+
+    _layer(s_patty, (154, 100, 66), (114, 70, 46))
+
+    # —— 芝士（带三处垂滴） ——
+    cheese_pts = [(-0.82, 0.10), (0.82, 0.10), (0.82, 0.24), (0.46, 0.17),
+                  (0.30, 0.35), (0.10, 0.17), (-0.14, 0.33), (-0.34, 0.17),
+                  (-0.56, 0.31), (-0.82, 0.22)]
+
+    def s_cheese(d, g, fill):
+        k = 1.0 + g / R
+        d.polygon([(X + px * R * k, Y + py * R * k) for px, py in cheese_pts], fill=fill)
+        for px, py in [(0.30, 0.35), (-0.14, 0.33), (-0.56, 0.31)]:
+            rr = 0.075 * R + g
+            d.ellipse([X + px * R - rr, Y + py * R - rr, X + px * R + rr, Y + py * R + rr], fill=fill)
+
+    _layer(s_cheese, (255, 216, 102), (243, 176, 42))
+
+    # —— 生菜（波浪垂边） ——
+    def s_lettuce(d, g, fill):
+        d.rectangle([X - 0.88 * R - g, Y - 0.02 * R - g, X + 0.88 * R + g, Y + 0.12 * R + g], fill=fill)
+        for i in range(-4, 5):
+            fx = X + i * 0.215 * R
+            rr = 0.115 * R + g
+            d.ellipse([fx - rr, Y + 0.02 * R - rr, fx + rr, Y + 0.02 * R + rr], fill=fill)
+
+    _layer(s_lettuce, (148, 202, 86), (108, 158, 56))
+
+    # —— 上层面包 ——
+    def s_top_bun(d, g, fill):
+        d.pieslice(
+            [X - 0.86 * R - g, Y - 1.02 * R - g, X + 0.86 * R + g, Y + 0.06 * R],
+            180, 360, fill=fill,
+        )
+
+    _layer(s_top_bun, (251, 208, 150), (231, 170, 104))
+
+    d = ImageDraw.Draw(canvas)
+
+    # 上层面包弧线光泽（沿面包左上曲线，替代糊状高光）
+    shine = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shine)
+    sd.arc(
+        [X - 0.78 * R, Y - 0.95 * R, X + 0.30 * R, Y - 0.05 * R],
+        182, 252, fill=(255, 255, 255, 120), width=max(3, int(R * 0.07)),
     )
+    sd.arc(
+        [X - 0.70 * R, Y - 0.86 * R, X + 0.22 * R, Y - 0.08 * R],
+        186, 246, fill=(255, 255, 255, 90), width=max(2, int(R * 0.035)),
+    )
+    shine = shine.filter(ImageFilter.GaussianBlur(3))
+    canvas.alpha_composite(shine)
+
+    # 芝麻（避开面部区域：X±0.25R、Y-0.5R~Y-0.1R）
+    for px, py, ang in [(-0.48, -0.60, 25), (-0.12, -0.80, -15), (0.30, -0.68, 70),
+                        (-0.38, -0.36, -50), (0.46, -0.34, 40)]:
+        _sesame(canvas, X + px * R, Y + py * R, max(3, int(R * 0.055)), max(2, int(R * 0.032)), ang)
+
+    # 肉饼烤痕
+    for px in (-0.32, 0.0, 0.32):
+        x0 = X + px * R - 0.16 * R
+        x1 = X + px * R + 0.16 * R
+        d.line([(x0, Y + 0.365 * R), (x1, Y + 0.345 * R)], fill=(74, 44, 30, 110), width=max(2, int(R * 0.028)))
+
+    # 芝士顶部反光
+    d.line([(X - 0.6 * R, Y + 0.13 * R), (X + 0.6 * R, Y + 0.13 * R)], fill=(255, 246, 214, 120), width=max(2, int(R * 0.022)))
+
+    # 下层面包底部暗影
+    d.arc([X - 0.84 * R, Y + 0.82 * R, X + 0.84 * R, Y + 1.04 * R], 20, 160, fill=(150, 96, 54, 90), width=max(2, int(R * 0.03)))
+
+    # —— 表情（吉祥物的灵魂） ——
+    eye_y = Y - 0.34 * R
+    eye_dx = 0.21 * R
+    eye_r = 0.078 * R
+    # 眉毛（俏皮地上挑）
+    for ex in (X - eye_dx, X + eye_dx):
+        d.arc([ex - 0.10 * R, eye_y - 0.17 * R, ex + 0.10 * R, eye_y - 0.01 * R], 200, 340, fill=(88, 54, 40, 230), width=max(2, int(R * 0.024)))
+    # 眼睛 + 高光
+    for ex in (X - eye_dx, X + eye_dx):
+        d.ellipse([ex - eye_r, eye_y - eye_r, ex + eye_r, eye_y + eye_r], fill=(62, 40, 30))
+        d.ellipse([ex - eye_r * 0.45, eye_y - eye_r * 0.5, ex + eye_r * 0.1, eye_y + eye_r * 0.05], fill=(255, 255, 255))
+    # 腮红
+    for bx in (X - 0.40 * R, X + 0.40 * R):
+        d.ellipse([bx - 0.085 * R, eye_y + 0.10 * R, bx + 0.085 * R, eye_y + 0.20 * R], fill=(244, 148, 122, 150))
+    # 微笑
+    d.arc([X - 0.11 * R, eye_y - 0.02 * R, X + 0.11 * R, eye_y + 0.16 * R], 25, 155, fill=(62, 40, 30), width=max(2, int(R * 0.03)))
+
+    img.alpha_composite(canvas, (int(cx - size / 2), int(cy - size / 2)))
 
 
 def _base_canvas() -> Image.Image:
@@ -294,7 +386,7 @@ def render_life_card(profile: LifeProfile, out_path: str) -> str:
     d.ellipse([cx - r - 12, cy - r - 12, cx + r + 12, cy + r + 12], fill=YELLOW)
     d.ellipse([cx - r - 4, cy - r - 4, cx + r + 4, cy + r + 4], fill=(255, 252, 244))
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(255, 250, 240))
-    draw_burger(d, cx, cy, r)
+    draw_burger(img, cx, cy, r)
 
     # 编号 + 等级药丸
     serial_f = load_font(28)
