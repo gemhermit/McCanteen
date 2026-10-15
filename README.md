@@ -208,7 +208,7 @@ McCanteen/
 ### 1. 获取代码
 
 ```bash
-git clone https://github.com/<your-name>/McCanteen.git
+git clone https://github.com/gemhermit/McCanteen.git
 cd McCanteen
 pip install Pillow        # 唯一第三方依赖，且仅出卡需要
 ```
