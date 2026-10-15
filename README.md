@@ -312,7 +312,7 @@ python tests/run_all.py
 | `MCP_INTEGRATION.md` | 实际使用的 MCP Server / Tool / 调用流程 / 业务价值 | ✅ 已提供 |
 | `mcp-config.example.json` | 脱敏后的 MCP 配置示例（仅环境变量占位符） | ✅ 已提供 |
 | 源代码 | 项目主体 | ✅ `src/` + `scripts/` |
-| `workbuddy.md` | WorkBuddy 开发对话上下文 | ✅ 已提供 |
+| `workbuddy.md` | WorkBuddy 开发对话上下文 | ✅ 已提供（含原始记录导出件 `workbuddy-raw-export.md`，自动导出 + 脱敏） |
 
 ## 许可证
 

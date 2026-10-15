@@ -2,6 +2,10 @@
 
 本文件记录麦门食堂（McCanteen）使用 **腾讯 WorkBuddy** 开发的对话上下文，用于麦当劳程序员创意开发大赛 WorkBuddy 联动奖励核验。
 
+> **原始记录导出件**：本目录下的 [`workbuddy-raw-export.md`](workbuddy-raw-export.md) 由
+> `scripts/export_workbuddy_log.py` 从本地会话记录自动导出（131 条消息 / 317 次工具调用，
+> 含全部文件写入与命令执行实录），本文件为其人工整理摘要。两者内容一致，可互相对勘。
+
 ## 开发环境
 
 - **开发工具**：腾讯 WorkBuddy（WorkBuddy 桌面版，AI 助手「墨白」）
